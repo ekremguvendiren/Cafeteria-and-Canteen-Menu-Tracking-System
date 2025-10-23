@@ -1,6 +1,8 @@
+<div align="center">
 🍽️ Cafeteria & Canteen Menu Tracking System
 A smart and efficient web-based system to manage, track, and update cafeteria menus effortlessly.
-It allows both administrators and users to stay updated with daily meals, categories, and real-time availability.
+It helps both administrators and users stay updated with daily meals, categories, and real-time availability.
+</div>
 🌟 Features
 ✅ Daily Menu Updates – Add, edit, or delete daily menu items easily.
 ✅ Category Management – Organize dishes by type (Breakfast, Lunch, Dinner, etc.).
