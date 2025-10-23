@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="Canteen Admin">Canteen Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+</head>
+<body class="bg-gray-100">
+
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4" data-lang="Admin Panel">Admin Panel</h1>
+
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4" data-lang="Publish Menu">Publish Menu</h2>
+      <form id="publish-menu-form" class="bg-white p-4 rounded-lg shadow-md">
+        <div class="mb-4">
+          <label for="start-date" class="block text-sm font-medium text-gray-700" data-lang="Start Date">Start Date</label>
+          <input type="date" id="start-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="2025-10-23">
+        </div>
+        <div class="mb-4">
+          <label for="end-date" class="block text-sm font-medium text-gray-700" data-lang="End Date">End Date</label>
+          <input type="date" id="end-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="2025-10-23">
+        </div>
+        <div class="mb-4">
+            <label for="menu-items" class="block text-sm font-medium text-gray-700" data-lang="Menu Items (JSON format)">Menu Items (JSON format)</label>
+            <textarea id="menu-items" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">[
+            {
+                id: "item-101", name: "Tomato Soup", description: "Domates Çorbası (100gr)", price: 13.00,
+                calories: 90, protein: 2, carbs: 15, fat: 3, sugar: 5, allergens: ["Gluten", "Dairy"], diet: ["Vegetarian"]
+            },
+            {
+                id: "item-102", name: "Peas Pilaf", description: "Bezelyeli Pilav (100gr)", price: 25.00,
+                calories: 190, protein: 5, carbs: 35, fat: 3, sugar: 2, allergens: ["Gluten"], diet: ["Vegetarian"]
+            },
+            {
+                id: "item-103", name: "Mashed Potatoes", description: "Patates Püresi (100gr)", price: 31.00,
+                calories: 150, protein: 3, carbs: 25, fat: 5, sugar: 2, allergens: ["Dairy"], diet: ["Vegetarian"]
+            },
+            {
+                id: "item-104", name: "Chicken Whole Wheat Pasta", description: "Tavuklu Tam Buğday Makarna (100gr)", price: 31.00,
+                calories: 280, protein: 22, carbs: 30, fat: 9, sugar: 2, allergens: ["Gluten"], diet: []
+            },
+            {
+                id: "item-105", name: "Boiled Vegetables", description: "Haşlanmış Sebze (100gr)", price: 23.00,
+                calories: 50, protein: 2, carbs: 8, fat: 1, sugar: 3, allergens: [], diet: ["Vegetarian", "Vegan"]
+            },
+            {
+                id: "item-106", name: "Karniyarik", description: "Stuffed eggplant (100gr)", price: 35.00,
+                calories: 240, protein: 10, carbs: 15, fat: 16, sugar: 5, allergens: [], diet: []
+            },
+            {
+                id: "item-107", name: "Fried Chicken (Piece)", description: "Kızarmış Tavuk (Adet)", price: 270.00,
+                calories: 850, protein: 70, carbs: 15, fat: 55, sugar: 0, allergens: ["Gluten"], diet: [] 
+            },
+            {
+                id: "item-108", name: "Grilled BBQ Chicken", description: "Izgara Mangal Tavuk (100gr)", price: 67.00,
+                calories: 180, protein: 30, carbs: 2, fat: 5, sugar: 1, allergens: [], diet: []
+            },
+            {
+                id: "item-109", name: "Crispy Chicken (100gr)", description: "Çıtır Tavuk (100gr)", price: 67.00,
+                calories: 380, protein: 25, carbs: 25, fat: 20, sugar: 2, allergens: ["Gluten"], diet: []
+            },
+            {
+                id: "item-110", name: "Lentil Soup", description: "Mercimek Çorbası (100gr)", price: 13.00,
+                calories: 70, protein: 4, carbs: 10, fat: 1, sugar: 0, allergens: [], diet: ["Vegetarian"]
+            },
+            {
+                id: "item-111", name: "Corn Rice Pilaf", description: "Mısırlı Pirinç Pilavı (100gr)", price: 25.00,
+                calories: 190, protein: 4, carbs: 38, fat: 3, sugar: 1, allergens: ["Gluten"], diet: []
+            },
+            {
+                id: "item-112", name: "Lasagna (100gr)", description: "Classic oven-baked lasagna (100gr)", price: 45.00,
+                calories: 340, protein: 17, carbs: 30, fat: 18, sugar: 3, allergens: ["Gluten", "Dairy"], diet: []
+            },
+            {
+                id: "item-113", name: "Lahmacun (1 Piece)", description: "Traditional Turkish flatbread with seasoned meat (1 Adet)", price: 95.00,
+                calories: 450, protein: 20, carbs: 50, fat: 20, sugar: 5, allergens: ["Gluten"], diet: []
+            }
+        ]</textarea>
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-lang="Publish">Publish</button>
+      </form>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-bold mb-4" data-lang="Incoming Orders">Incoming Orders</h2>
+      <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Orders will be dynamically inserted here -->
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/admin.js" type="module"></script>
+</body>
+</html>

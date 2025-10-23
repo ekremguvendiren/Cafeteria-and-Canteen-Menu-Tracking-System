@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafeteria Menu and Nutritional Tracking System</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for aesthetic icons -->
+    <script type="module" src="https://unpkg.com/lucide @latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght @100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container-card {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+        .tab-button.active {
+            border-bottom: 3px solid #10B981; /* Emerald Green */
+            color: #10B981;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 3px;
+        }
+        .filter-checkbox:checked + span {
+            font-weight: 600;
+        }
+        /* Hide unused sections for this version */
+        #tab-order, #tab-myorders, #order-section, #myorders-section {
+            display: none !important;
+        }
+
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">
+                <span class="text-emerald-600">🍽️</span> Cafeteria Menu and Nutritional Tracking System
+            </h1>
+            <p class="text-lg text-gray-500">View daily menu, check nutritional impact, and place your order.</p>
+        </header>
+
+        <div class="container-card bg-white rounded-xl p-4 md:p-8">
+            <!-- Tab Navigation (Only View Menu is visible) -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tab-menu" class="tab-button active flex-1 py-3 text-lg font-semibold text-gray-600 transition duration-150 ease-in-out hover:text-emerald-500" onclick="showSection('menu')">
+                    View Menu
+                </button>
+                <button id="tab-order" class="tab-button flex-1 py-3 text-lg font-semibold text-gray-600 transition duration-150 ease-in-out hover:text-emerald-500" onclick="showSection('order')">
+                    Place Order
+                </button>
+                <button id="tab-myorders" class="tab-button flex-1 py-3 text-lg font-semibold text-gray-600 transition duration-150 ease-in-out hover:text-emerald-500" onclick="showSection('myorders')">
+                    My Orders
+                </button>
+            </div>
+
+            <!-- Content Sections -->
+            <div id="menu-section" class="content-section">
+
+                <!-- Menu Display Header and Filters -->
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center">
+                    <i data-lucide="calendar-days" class="w-6 h-6 mr-2 text-emerald-500"></i> Current Menu
+                </h2>
+                
+                <!-- Cart Summary -->
+                <div id="cart-summary" class="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-200 shadow-sm">
+                    <div class="flex justify-between items-center pb-2 border-b border-indigo-200">
+                        <div class="flex items-center">
+                            <i data-lucide="shopping-cart" class="w-6 h-6 mr-3 text-indigo-700"></i>
+                            <span class="font-bold text-indigo-700">Your Cart:</span>
+                            <span id="cart-item-count" class="ml-2 font-semibold text-lg text-indigo-600">0 Items</span>
+                        </div>
+                        <div class="font-extrabold text-2xl text-indigo-800">
+                            <span id="cart-total-amount">0.00 ₺</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Cart Item List -->
+                    <div id="cart-items-list" class="mt-3 space-y-2 text-sm text-gray-700 custom-scrollbar max-h-40 overflow-y-auto">
+                        <!-- Items will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="mb-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <h3 class="font-extrabold text-lg text-emerald-800 mb-3 flex items-center">
+                        <i data-lucide="filter" class="w-5 h-5 mr-2"></i> Customize Menu Filters
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Dietary Filters (Inclusion Logic) -->
+                        <div>
+                            <p class="text-sm font-bold text-emerald-700 mb-2 border-b border-emerald-300 pb-1">Dietary Preferences (Show Only):</p>
+                            <div class="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-vegan" value="Vegan" onchange="toggleFilter('Vegan')" class="filter-checkbox rounded text-green-600 focus:ring-green-600">
+                                    <span class="ml-2 transition">🌱 Vegan</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-vegetarian" value="Vegetarian" onchange="toggleFilter('Vegetarian')" class="filter-checkbox rounded text-green-600 focus:ring-green-600">
+                                    <span class="ml-2 transition">🥬 Vegetarian</span>
+                                </label>
+                                <button onclick="clearDietaryFilters()" class="ml-4 text-xs text-emerald-600 hover:text-emerald-800 font-semibold underline transition">Clear Diet</button>
+                            </div>
+                        </div>
+
+                        <!-- Allergen Filters (Exclusion Logic: "Free From") -->
+                        <div>
+                            <p class="text-sm font-bold text-red-700 mb-2 border-b border-red-300 pb-1">Allergen Exclusion (Hide Items With):</p>
+                            <div class="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-gluten" value="Gluten" onchange="toggleFilter('Gluten')" class="filter-checkbox rounded text-red-600 focus:ring-red-600">
+                                    <span class="ml-2 transition">🌾 Gluten</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-dairy" value="Dairy" onchange="toggleFilter('Dairy')" class="filter-checkbox rounded text-red-600 focus:ring-red-600">
+                                    <span class="ml-2 transition">🥛 Dairy (Milk Products)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-peanuts" value="Peanuts" onchange="toggleFilter('Peanuts')" class="filter-checkbox rounded text-red-600 focus:ring-red-600">
+                                    <span class="ml-2 transition">🥜 Peanuts</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="filter-shellfish" value="Shellfish" onchange="toggleFilter('Shellfish')" class="filter-checkbox rounded text-red-600 focus:ring-red-600">
+                                    <span class="ml-2 transition">🦐 Shellfish</span>
+                                </label>
+                                <button onclick="clearAllergenFilters()" class="ml-4 text-xs text-red-600 hover:text-red-800 font-semibold underline transition">Clear Allergens</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Filter Section -->
+
+
+                <!-- Menu Display -->
+                <div id="menu-display" class="grid md:grid-cols-2 gap-6">
+                    <!-- Menu items will be inserted here by JS -->
+                    <p class="md:col-span-2 text-center text-gray-500 italic" id="menu-loading">Menu data loading...</p>
+                </div>
+                
+                <!-- Nutritional Planner Section (MOVED TO BOTTOM) -->
+                <div class="mt-8 pt-4 border-t border-gray-200">
+                    <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-300 shadow-md">
+                        <h2 class="text-2xl font-bold text-yellow-800 mb-3 flex items-center">
+                            <i data-lucide="dumbbell" class="w-6 h-6 mr-2"></i> Nutritional Planner
+                        </h2>
+                        
+                        <div id="planner-inputs" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                            <select id="user-gender" class="col-span-1 rounded-lg border-gray-300 p-2 text-sm">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                            <input type="number" id="user-age" placeholder="Age (years)" class="col-span-1 rounded-lg border-gray-300 p-2 text-sm" value="20">
+                            <input type="number" id="user-weight" placeholder="Weight (kg)" class="col-span-1 rounded-lg border-gray-300 p-2 text-sm" value="70">
+                            <input type="number" id="user-height" placeholder="Height (cm)" class="col-span-1 rounded-lg border-gray-300 p-2 text-sm" value="175">
+                            <select id="user-activity" class="col-span-2 md:col-span-1 rounded-lg border-gray-300 p-2 text-sm">
+                                <option value="1.2">Sedentary (1.2)</option>
+                                <option value="1.375" selected>Lightly Active (1.375)</option>
+                                <option value="1.55">Moderately Active (1.55)</option>
+                                <option value="1.725">Highly Active (1.725)</option>
+                                <option value="1.9">Extremely Active (1.9)</option>
+                            </select>
+                            <button id="calculate-daily-needs-btn" onclick="calculateDailyNeeds()" class="col-span-2 md:col-span-5 bg-yellow-600 text-white font-semibold py-2 rounded-lg hover:bg-yellow-700 transition">
+                                Calculate Daily Needs
+                            </button>
+                        </div>
+
+                        <div id="daily-goals" class="mt-4 bg-white p-3 rounded-lg border border-gray-200">
+                            <p class="font-bold text-gray-700 mb-2">Daily Goal Status (Based on Cart):</p>
+                            <div class="space-y-2 text-sm">
+                                <!-- Calories -->
+                                <div>
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Calories:</span>
+                                        <span><span id="consumed-cal">0</span> / <span id="goal-cal">2000</span> kcal</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div id="cal-progress" class="progress-fill bg-red-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <!-- Protein -->
+                                <div>
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Protein:</span>
+                                        <span><span id="consumed-protein">0</span> / <span id="goal-protein">100</span> g</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div id="protein-progress" class="progress-fill bg-blue-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <!-- Carbs -->
+                                <div>
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Carbohydrates:</span>
+                                        <span><span id="consumed-carbs">0</span> / <span id="goal-carbs">250</span> g</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div id="carbs-progress" class="progress-fill bg-yellow-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <!-- Fat -->
+                                <div>
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Fat:</span>
+                                        <span><span id="consumed-fat">0</span> / <span id="goal-fat">55</span> g</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div id="fat-progress" class="progress-fill bg-red-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden Sections -->
+            <div id="order-section" class="content-section hidden"></div>
+            <div id="myorders-section" class="content-section hidden"></div>
+
+            <!-- Item Details Modal -->
+            <div id="item-detail-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all">
+                    <div class="p-6">
+                        <h3 id="detail-modal-name" class="text-2xl font-bold mb-2 text-gray-800"></h3>
+                        <p id="detail-modal-description" class="text-gray-600 mb-4 text-sm"></p>
+                        
+                        <div id="detail-nutritional-info" class="space-y-3 p-3 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <p class="semibold text-gray-700">Nutritional Facts (Per Serving):</p>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <p>Calories: <span id="detail-cal" class="font-bold text-red-600"></span> kcal</p>
+                                <p>Protein: <span id="detail-protein" class="font-bold text-blue-600"></span> g</p>
+                                <p>Carbs: <span id="detail-carbs" class="font-bold text-yellow-600"></span> g</p>
+                                <p>Sugar: <span id="detail-sugar" class="font-bold text-pink-600"></span> g</p>
+                            </div>
+                        </div>
+
+                        <div id="daily-impact-info" class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <p class="font-bold text-indigo-700 mb-2">Daily Impact (Cart + Item):</p>
+                            <p id="impact-cal" class="text-sm">Total Calories: <span class="font-bold"></span></p>
+                            <p id="impact-protein" class="text-sm">Total Protein: <span class="font-bold"></span></p>
+                            <p id="impact-carbs" class="text-sm">Total Carbs: <span class="font-bold"></span></p>
+                            <p id="impact-fat" class="text-sm">Total Fat: <span class="font-bold"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end items-center p-4 border-t border-gray-200">
+                        <button onclick="closeDetailModal()" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Moduler App Entry Point - CLI will fill this in -->
+    <script>
+        function calculateDailyNeeds() {
+            // All calculation functions from planner.js
+            function calculateBMR(gender, weight, height, age) {
+                if (gender === 'male') return (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                return (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+
+            function calculateTDEE(bmr, activityMultiplier) {
+                return bmr * activityMultiplier;
+            }
+
+            function calculateMacroTargets(tdee, weight) {
+                const proteinGrams = weight * 1.8;
+                const proteinCalories = proteinGrams * 4;
+                const remainingCalories = tdee - proteinCalories;
+                const fatCalories = remainingCalories * 0.25;
+                const fatGrams = fatCalories / 9;
+                const carbCalories = remainingCalories * 0.75;
+                const carbGrams = carbCalories / 4;
+                return {
+                    calories: tdee.toFixed(0),
+                    protein: proteinGrams.toFixed(0),
+                    carbs: carbGrams.toFixed(0),
+                    fat: fatGrams.toFixed(0)
+                };
+            }
+
+            // Main logic from app.js's calculateAndDisplayDailyNeeds
+            const gender = document.getElementById('user-gender').value;
+            const age = parseFloat(document.getElementById('user-age').value);
+            const weight = parseFloat(document.getElementById('user-weight').value);
+            const height = parseFloat(document.getElementById('user-height').value);
+            const activityMultiplier = parseFloat(document.getElementById('user-activity').value);
+
+            const bmr = calculateBMR(gender, weight, height, age);
+            const tdee = calculateTDEE(bmr, activityMultiplier);
+            const dailyMacroTargets = calculateMacroTargets(tdee, weight);
+
+            document.getElementById('goal-cal').textContent = dailyMacroTargets.calories;
+            document.getElementById('goal-protein').textContent = dailyMacroTargets.protein;
+            document.getElementById('goal-carbs').textContent = dailyMacroTargets.carbs;
+            document.getElementById('goal-fat').textContent = dailyMacroTargets.fat;
+        }
+        window.calculateDailyNeeds = calculateDailyNeeds;
+    </script>
+    <script type="module" src="./js/app.js"></script> 
+</body>
+</html>
